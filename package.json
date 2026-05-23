@@ -1,0 +1,21 @@
+{
+  "name": "github-api-test-automation",
+  "version": "1.0.0",
+  "description": "Portfolio-ready API test automation framework for GitHub REST API using Playwright and TypeScript.",
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24.16.0 <25"
+  },
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^24.12.4",
+    "dotenv": "^17.4.2",
+    "typescript": "^6.0.3"
+  }
+}

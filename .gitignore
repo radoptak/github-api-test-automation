@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# Playwright test artifacts
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Logs
+npm-debug.log*
+
+# macOS
+.DS_Store
