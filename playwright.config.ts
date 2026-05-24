@@ -1,15 +1,7 @@
-import dotenv from 'dotenv';
 import { defineConfig } from '@playwright/test';
+import { requireEnvironmentVariable } from './src/config/environment';
 
-dotenv.config({ quiet: true });
-
-const apiToken = process.env.GH_API_TOKEN;
-
-if (!apiToken) {
-  throw new Error(
-    'Missing GH_API_TOKEN. Create a local .env file based on .env.example before running API tests.',
-  );
-}
+const apiToken = requireEnvironmentVariable('GH_API_TOKEN');
 
 export default defineConfig({
   testDir: './tests',
