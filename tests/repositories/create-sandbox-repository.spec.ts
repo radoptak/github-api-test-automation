@@ -22,33 +22,44 @@ test.describe('Sandbox repository API', () => {
     let repositoryWasCreated = false;
 
     try {
-      const createResponse = await repositoryClient.createRepository({
-        name: repositoryName,
-        description: 'Repository created by automated API test.',
-        private: true,
-      });
+      const createResponse = await test.step(
+        'Create a private repository in the sandbox organization',
+        async () => {
+          const response = await repositoryClient.createRepository({
+            name: repositoryName,
+            description: 'Repository created by automated API test.',
+            private: true,
+          });
 
-      expect(createResponse.status()).toBe(201);
+          expect(response.status()).toBe(201);
 
-      repositoryWasCreated = true;
+          repositoryWasCreated = true;
 
-      const responseBody =
-        (await createResponse.json()) as CreatedRepositoryResponseBody;
-
-      expect(responseBody.name).toBe(repositoryName);
-      expect(responseBody.full_name).toBe(
-        `${sandboxOrganization}/${repositoryName}`,
+          return response;
+        },
       );
-      expect(responseBody.private).toBe(true);
-    } finally {
-      const deleteResponse =
-        await repositoryClient.deleteRepository(repositoryName);
 
-      if (repositoryWasCreated) {
-        expect.soft(deleteResponse.status()).toBe(204);
-      } else {
-        expect.soft([204, 404]).toContain(deleteResponse.status());
-      }
+      await test.step('Verify created repository details', async () => {
+        const responseBody =
+          (await createResponse.json()) as CreatedRepositoryResponseBody;
+
+        expect(responseBody.name).toBe(repositoryName);
+        expect(responseBody.full_name).toBe(
+          `${sandboxOrganization}/${repositoryName}`,
+        );
+        expect(responseBody.private).toBe(true);
+      });
+    } finally {
+      await test.step('Delete sandbox repository during cleanup', async () => {
+        const deleteResponse =
+          await repositoryClient.deleteRepository(repositoryName);
+
+        if (repositoryWasCreated) {
+          expect.soft(deleteResponse.status()).toBe(204);
+        } else {
+          expect.soft([204, 404]).toContain(deleteResponse.status());
+        }
+      });
     }
   });
 });
