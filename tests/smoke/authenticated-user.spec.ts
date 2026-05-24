@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../src/fixtures/authenticated-api.fixture';
 import { requireEnvironmentVariable } from '../../src/config/environment';
 
 interface AuthenticatedUserResponseBody {
@@ -10,8 +10,8 @@ interface AuthenticatedUserResponseBody {
 const expectedUsername = requireEnvironmentVariable('GH_API_USERNAME');
 
 test.describe('Authenticated user API', () => {
-  test('should return profile details for the configured authenticated user', async ({ request }) => {
-    const response = await request.get('/user');
+  test('should return profile details for the configured authenticated user', async ({ authenticatedRequest }) => {
+    const response = await authenticatedRequest.get('/user');
 
     expect(response.status()).toBe(200);
 
