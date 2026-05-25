@@ -3,3 +3,7 @@ export interface CreateSandboxRepositoryRequestBody {
   description: string;
   private: true;
 }
+
+export interface UpdateSandboxRepositoryDescriptionRequestBody {
+  description: string;
+}

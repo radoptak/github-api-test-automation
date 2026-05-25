@@ -1,5 +1,8 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
-import type { CreateSandboxRepositoryRequestBody } from '../types/github-repository.types';
+import type {
+  CreateSandboxRepositoryRequestBody,
+  UpdateSandboxRepositoryDescriptionRequestBody,
+} from '../types/github-repository.types';
 import { assertSandboxRepositoryName } from '../utils/sandbox-repository-name';
 
 export class GitHubSandboxRepositoryClient {
@@ -26,6 +29,20 @@ export class GitHubSandboxRepositoryClient {
 
     return this.request.get(
       `/repos/${encodeURIComponent(this.organization)}/${encodeURIComponent(repositoryName)}`,
+    );
+  }
+
+  public async updateRepositoryDescription(
+    repositoryName: string,
+    requestBody: UpdateSandboxRepositoryDescriptionRequestBody,
+  ): Promise<APIResponse> {
+    assertSandboxRepositoryName(repositoryName);
+
+    return this.request.patch(
+      `/repos/${encodeURIComponent(this.organization)}/${encodeURIComponent(repositoryName)}`,
+      {
+        data: requestBody,
+      },
     );
   }
 
