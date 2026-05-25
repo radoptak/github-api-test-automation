@@ -4,7 +4,7 @@ Portfolio-ready API test automation framework built with **Playwright** and **Ty
 
 The project demonstrates not only API test implementation, but also safe handling of authenticated and destructive test operations, maintainable framework architecture, and deliberate engineering decisions suitable for a real-world QA Automation project.
 
-> **Project status:** Actively developed. The current version covers authenticated user verification and safe private repository creation with cleanup inside an isolated sandbox organization.
+> **Project status:** Actively developed. The current version covers authenticated user verification and safe private repository creation, retrieval, and description update scenarios inside an isolated sandbox organization.
 
 ## Tech Stack
 
@@ -46,6 +46,18 @@ Verifies that the framework can:
 
 This scenario keeps setup and cleanup outside the test body, so the test remains focused on repository retrieval behaviour.
 
+### Sandbox Repository Description Update Test
+
+Verifies that the framework can:
+
+- prepare an existing private repository through a reusable fixture;
+- update only its description through `PATCH`;
+- confirm the updated repository details in the `PATCH` response;
+- retrieve the repository again through `GET` to confirm that the updated description was persisted;
+- remove the fixture-created repository during teardown.
+
+The first update scenario intentionally changes only the repository description, avoiding mutations such as renaming the resource or changing its visibility, which would increase cleanup risk.
+
 ### Sandbox Repository Name Unit Tests
 
 Verify the local safety mechanism responsible for repository naming:
@@ -65,6 +77,7 @@ Current safety measures include:
 - a dedicated sandbox organization for repository CRUD tests;
 - a fine-grained personal access token scoped to the sandbox organization;
 - temporary repositories forced to be private at the TypeScript type level;
+- the first `PATCH` scenario limited to changing only the repository description, without renaming the resource or changing its visibility;
 - generated repository names prefixed with `api-test-repo-`;
 - a runtime guard blocking repository operations for names outside the test prefix;
 - cleanup attempted in a `finally` block even when functional assertions fail;
@@ -89,7 +102,8 @@ src/
 tests/
 ├── repositories/
 │   ├── create-sandbox-repository.spec.ts
-│   └── get-sandbox-repository.spec.ts
+│   ├── get-sandbox-repository.spec.ts
+│   └── update-sandbox-repository-description.spec.ts
 ├── smoke/
 │   └── authenticated-user.spec.ts
 └── unit/
@@ -182,6 +196,21 @@ CREATE test → creation is explicit in the test body
 GET test    → repository setup and teardown are handled by a fixture
 ```
 
+### Repository Updates Are Intentionally Narrow
+
+The first `PATCH` scenario updates only the repository description.
+
+This is a deliberate safety decision. Changing the repository name would affect the identifier used by fixture teardown, while changing repository visibility would introduce an unnecessary risk of exposing a temporary test resource publicly.
+
+The update flow therefore remains controlled:
+
+```text
+fixture creates a private repository
+PATCH updates only its description
+GET confirms that the new description was persisted
+fixture deletes the repository using its unchanged name
+```
+
 ## Prerequisites
 
 - Node.js `>=24.16.0 <25`
@@ -269,6 +298,12 @@ npm test -- tests/repositories/create-sandbox-repository.spec.ts
 npm test -- tests/repositories/get-sandbox-repository.spec.ts
 ```
 
+### Sandbox Repository Description Update Test Only
+
+```bash
+npm test -- tests/repositories/update-sandbox-repository-description.spec.ts
+```
+
 ### Local Safety Unit Tests Only
 
 ```bash
@@ -281,9 +316,9 @@ The project uses:
 
 - terminal list reporting for fast local feedback;
 - Playwright HTML reporting for detailed result inspection;
-- explicit `test.step()` reporting for the multi-stage repository creation scenario.
+- explicit `test.step()` reporting for multi-stage repository scenarios.
 
-The current sandbox repository test reports its main lifecycle phases as separate steps:
+The sandbox repository creation test reports:
 
 ```text
 Create a private repository in the sandbox organization
@@ -291,7 +326,22 @@ Verify created repository details
 Delete sandbox repository during cleanup
 ```
 
-This makes the report easier to read and helps distinguish whether a failure occurred during resource creation, response verification, or cleanup.
+The repository retrieval test reports:
+
+```text
+Retrieve an existing private sandbox repository
+Verify retrieved repository details
+```
+
+The repository description update test reports:
+
+```text
+Update the sandbox repository description
+Verify updated repository details in the PATCH response
+Verify the updated description is persisted
+```
+
+This makes the report easier to read and helps distinguish whether a failure occurred during resource creation, retrieval, update verification, persistence confirmation, or cleanup.
 
 After running the tests, open the HTML report with:
 
@@ -303,19 +353,20 @@ Generated reports are excluded from version control.
 
 ## Implemented Scenarios
 
-| Area                 | Scenario                                                                | Status      |
-| -------------------- | ----------------------------------------------------------------------- | ----------- |
-| Authentication       | Return the configured authenticated GitHub user.                        | Implemented |
-| Repository safety    | Generate and validate safe sandbox repository names.                    | Implemented |
-| Repository creation  | Create a private repository in the sandbox organization.                | Implemented |
-| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture. | Implemented |
-| Repository cleanup   | Delete repositories created by tests or fixtures.                       | Implemented |
+| Area                 | Scenario                                                                                  | Status      |
+| -------------------- | ----------------------------------------------------------------------------------------- | ----------- |
+| Authentication       | Return the configured authenticated GitHub user.                                          | Implemented |
+| Repository safety    | Generate and validate safe sandbox repository names.                                      | Implemented |
+| Repository creation  | Create a private repository in the sandbox organization.                                  | Implemented |
+| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture.                   | Implemented |
+| Repository update    | Update the description of an existing private repository and confirm the persisted state. | Implemented |
+| Repository cleanup   | Delete repositories created by tests or fixtures.                                         | Implemented |
 
 ## Roadmap
 
 Planned next steps:
 
-- update repository metadata using `PATCH`;
+- add an explicit repository deletion scenario and confirm the removed resource returns `404`;
 - build a complete repository CRUD lifecycle scenario;
 - add negative API scenarios such as duplicate repository creation and missing resources;
 - configure GitHub Actions CI securely;
@@ -332,6 +383,8 @@ This project is intended to demonstrate practical QA Automation skills, includin
 - typed request payloads;
 - fixture-based dependency setup;
 - fixture-based setup and teardown for tests requiring existing API resources;
+- controlled `PATCH` operations with deliberately limited request payloads;
+- persisted-state verification through a follow-up `GET` request;
 - environment and secret management;
 - safe handling of destructive test operations;
 - cleanup strategy for created test data;
