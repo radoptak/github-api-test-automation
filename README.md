@@ -35,6 +35,17 @@ Verifies that the framework can:
 - remove the created repository during cleanup;
 - report the create, verify, and cleanup phases as readable Playwright test steps.
 
+### Sandbox Repository Retrieval Test
+
+Verifies that the framework can:
+
+- prepare an existing private repository through a reusable fixture;
+- retrieve that repository from the sandbox organization using `GET`;
+- confirm its expected name, owner, description, and privacy state;
+- remove the fixture-created repository during teardown.
+
+This scenario keeps setup and cleanup outside the test body, so the test remains focused on repository retrieval behaviour.
+
 ### Sandbox Repository Name Unit Tests
 
 Verify the local safety mechanism responsible for repository naming:
@@ -68,7 +79,8 @@ src/
 ├── config/
 │   └── environment.ts
 ├── fixtures/
-│   └── authenticated-api.fixture.ts
+│   ├── authenticated-api.fixture.ts
+│   └── sandbox-repository.fixture.ts
 ├── types/
 │   └── github-repository.types.ts
 └── utils/
@@ -76,7 +88,8 @@ src/
 
 tests/
 ├── repositories/
-│   └── create-sandbox-repository.spec.ts
+│   ├── create-sandbox-repository.spec.ts
+│   └── get-sandbox-repository.spec.ts
 ├── smoke/
 │   └── authenticated-user.spec.ts
 └── unit/
@@ -85,16 +98,16 @@ tests/
 
 ### Responsibilities
 
-| Area                 | Responsibility                                                               |
-| -------------------- | ---------------------------------------------------------------------------- |
-| `config`             | Loads and validates required environment variables.                          |
-| `fixtures`           | Provides authenticated API request contexts only to tests that require them. |
-| `clients`            | Encapsulates GitHub sandbox repository API operations.                       |
-| `types`              | Defines controlled request payload contracts.                                |
-| `utils`              | Provides repository naming and runtime safety guards.                        |
-| `tests/smoke`        | Validates the authenticated API foundation.                                  |
-| `tests/repositories` | Validates repository behaviour inside the sandbox organization.              |
-| `tests/unit`         | Validates local framework safety logic without external API dependencies.    |
+| Area                 | Responsibility                                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `config`             | Loads and validates required environment variables.                                                                              |
+| `fixtures`           | Provides authenticated API request contexts and reusable sandbox repository setup/teardown for tests that require prepared data. |
+| `clients`            | Encapsulates GitHub sandbox repository API operations.                                                                           |
+| `types`              | Defines controlled request payload contracts.                                                                                    |
+| `utils`              | Provides repository naming and runtime safety guards.                                                                            |
+| `tests/smoke`        | Validates the authenticated API foundation.                                                                                      |
+| `tests/repositories` | Validates repository behaviour inside the sandbox organization.                                                                  |
+| `tests/unit`         | Validates local framework safety logic without external API dependencies.                                                        |
 
 ## Key Engineering Decisions
 
@@ -151,6 +164,23 @@ Delete sandbox repository during cleanup
 ```
 
 This keeps the HTML report readable and makes failures easier to diagnose without splitting every individual assertion into a separate reporting step.
+
+### Existing Resource Scenarios Use Fixture-Based Setup and Teardown
+
+The repository retrieval scenario requires an existing private repository before the `GET` request can be tested.
+
+Instead of repeating repository creation and cleanup directly inside the retrieval test, a dedicated `sandboxRepository` fixture:
+
+- creates a uniquely named private repository before the test;
+- exposes the expected repository data to the scenario;
+- removes the repository during teardown.
+
+This keeps each test focused on the behaviour it validates:
+
+```text
+CREATE test → creation is explicit in the test body
+GET test    → repository setup and teardown are handled by a fixture
+```
 
 ## Prerequisites
 
@@ -233,6 +263,12 @@ npm test -- tests/smoke/authenticated-user.spec.ts
 npm test -- tests/repositories/create-sandbox-repository.spec.ts
 ```
 
+### Sandbox Repository Retrieval Test Only
+
+```bash
+npm test -- tests/repositories/get-sandbox-repository.spec.ts
+```
+
 ### Local Safety Unit Tests Only
 
 ```bash
@@ -267,18 +303,18 @@ Generated reports are excluded from version control.
 
 ## Implemented Scenarios
 
-| Area                | Scenario                                                 | Status      |
-| ------------------- | -------------------------------------------------------- | ----------- |
-| Authentication      | Return the configured authenticated GitHub user.         | Implemented |
-| Repository safety   | Generate and validate safe sandbox repository names.     | Implemented |
-| Repository creation | Create a private repository in the sandbox organization. | Implemented |
-| Repository cleanup  | Delete the repository created by the test.               | Implemented |
+| Area                 | Scenario                                                                | Status      |
+| -------------------- | ----------------------------------------------------------------------- | ----------- |
+| Authentication       | Return the configured authenticated GitHub user.                        | Implemented |
+| Repository safety    | Generate and validate safe sandbox repository names.                    | Implemented |
+| Repository creation  | Create a private repository in the sandbox organization.                | Implemented |
+| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture. | Implemented |
+| Repository cleanup   | Delete repositories created by tests or fixtures.                       | Implemented |
 
 ## Roadmap
 
 Planned next steps:
 
-- retrieve a created repository using `GET`;
 - update repository metadata using `PATCH`;
 - build a complete repository CRUD lifecycle scenario;
 - add negative API scenarios such as duplicate repository creation and missing resources;
@@ -295,6 +331,7 @@ This project is intended to demonstrate practical QA Automation skills, includin
 - structured and maintainable framework design;
 - typed request payloads;
 - fixture-based dependency setup;
+- fixture-based setup and teardown for tests requiring existing API resources;
 - environment and secret management;
 - safe handling of destructive test operations;
 - cleanup strategy for created test data;
