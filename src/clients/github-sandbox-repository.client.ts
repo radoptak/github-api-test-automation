@@ -21,6 +21,14 @@ export class GitHubSandboxRepositoryClient {
     );
   }
 
+  public async getRepository(repositoryName: string): Promise<APIResponse> {
+    assertSandboxRepositoryName(repositoryName);
+
+    return this.request.get(
+      `/repos/${encodeURIComponent(this.organization)}/${encodeURIComponent(repositoryName)}`,
+    );
+  }
+
   public async deleteRepository(repositoryName: string): Promise<APIResponse> {
     assertSandboxRepositoryName(repositoryName);
 
