@@ -4,7 +4,7 @@ Portfolio-ready API test automation framework built with **Playwright** and **Ty
 
 The project demonstrates not only API test implementation, but also safe handling of authenticated and destructive test operations, maintainable framework architecture, and deliberate engineering decisions suitable for a real-world QA Automation project.
 
-> **Project status:** Actively developed. The current version covers authenticated user verification and safe private repository creation, retrieval, and description update scenarios inside an isolated sandbox organization.
+> **Project status:** Actively developed. The current version covers authenticated user verification and safe private repository creation, retrieval, description update, and deletion scenarios inside an isolated sandbox organization.
 
 ## Tech Stack
 
@@ -58,6 +58,18 @@ Verifies that the framework can:
 
 The first update scenario intentionally changes only the repository description, avoiding mutations such as renaming the resource or changing its visibility, which would increase cleanup risk.
 
+### Sandbox Repository Deletion Test
+
+Verifies that the framework can:
+
+- prepare a private sandbox repository specifically for deletion;
+- delete the existing repository through `DELETE`;
+- confirm the successful deletion response;
+- retrieve the deleted repository through `GET` and confirm that it returns `404`;
+- perform fallback cleanup only if deletion was not successfully confirmed.
+
+This scenario intentionally creates and manages its own repository because deletion itself is the behaviour under test.
+
 ### Sandbox Repository Name Unit Tests
 
 Verify the local safety mechanism responsible for repository naming:
@@ -102,6 +114,7 @@ src/
 tests/
 ├── repositories/
 │   ├── create-sandbox-repository.spec.ts
+│   ├── delete-sandbox-repository.spec.ts
 │   ├── get-sandbox-repository.spec.ts
 │   └── update-sandbox-repository-description.spec.ts
 ├── smoke/
@@ -211,6 +224,21 @@ GET confirms that the new description was persisted
 fixture deletes the repository using its unchanged name
 ```
 
+### Deletion Is Tested Explicitly Without Automatic Resource Teardown
+
+The deletion scenario uses the existing `repositoryClient` fixture, but intentionally does not request the automatic `sandboxRepository` fixture.
+
+Because deletion itself is the behaviour under test, the scenario:
+
+```text
+creates its own repository
+deletes it explicitly
+confirms that a later GET returns 404
+uses fallback cleanup only if successful deletion was not confirmed
+```
+
+This avoids a duplicate teardown attempt after a successful `DELETE` while still protecting the sandbox from leftover resources after a failure.
+
 ## Prerequisites
 
 - Node.js `>=24.16.0 <25`
@@ -304,6 +332,12 @@ npm test -- tests/repositories/get-sandbox-repository.spec.ts
 npm test -- tests/repositories/update-sandbox-repository-description.spec.ts
 ```
 
+### Sandbox Repository Deletion Test Only
+
+```bash
+npm test -- tests/repositories/delete-sandbox-repository.spec.ts
+```
+
 ### Local Safety Unit Tests Only
 
 ```bash
@@ -341,7 +375,21 @@ Verify updated repository details in the PATCH response
 Verify the updated description is persisted
 ```
 
-This makes the report easier to read and helps distinguish whether a failure occurred during resource creation, retrieval, update verification, persistence confirmation, or cleanup.
+The repository deletion test reports:
+
+```text
+Prepare a private sandbox repository for deletion
+Delete the existing sandbox repository
+Verify the deleted sandbox repository is no longer available
+```
+
+If the deletion scenario fails before successful deletion is confirmed, the report may also include:
+
+```text
+Delete sandbox repository during fallback cleanup
+```
+
+This makes the report easier to read and helps distinguish whether a failure occurred during resource creation, retrieval, update verification, persistence confirmation, deletion, missing-resource confirmation, or cleanup.
 
 After running the tests, open the HTML report with:
 
@@ -353,22 +401,23 @@ Generated reports are excluded from version control.
 
 ## Implemented Scenarios
 
-| Area                 | Scenario                                                                                  | Status      |
-| -------------------- | ----------------------------------------------------------------------------------------- | ----------- |
-| Authentication       | Return the configured authenticated GitHub user.                                          | Implemented |
-| Repository safety    | Generate and validate safe sandbox repository names.                                      | Implemented |
-| Repository creation  | Create a private repository in the sandbox organization.                                  | Implemented |
-| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture.                   | Implemented |
-| Repository update    | Update the description of an existing private repository and confirm the persisted state. | Implemented |
-| Repository cleanup   | Delete repositories created by tests or fixtures.                                         | Implemented |
+| Area                 | Scenario                                                                                                   | Status      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- | ----------- |
+| Authentication       | Return the configured authenticated GitHub user.                                                           | Implemented |
+| Repository safety    | Generate and validate safe sandbox repository names.                                                       | Implemented |
+| Repository creation  | Create a private repository in the sandbox organization.                                                   | Implemented |
+| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture.                                    | Implemented |
+| Repository update    | Update the description of an existing private repository and confirm the persisted state.                  | Implemented |
+| Repository deletion  | Delete an existing private repository and confirm that subsequent retrieval returns `404`.                 | Implemented |
+| Repository cleanup   | Clean up repositories created by tests or fixtures, including fallback cleanup for deletion failure paths. | Implemented |
 
 ## Roadmap
 
 Planned next steps:
 
-- add an explicit repository deletion scenario and confirm the removed resource returns `404`;
 - build a complete repository CRUD lifecycle scenario;
 - add negative API scenarios such as duplicate repository creation and missing resources;
+- add a client-level safety test confirming that unsafe repository names are blocked before any API request is sent;
 - configure GitHub Actions CI securely;
 - publish HTML test reports as CI artifacts;
 - expand recruiter-facing documentation as the framework grows.
@@ -385,6 +434,8 @@ This project is intended to demonstrate practical QA Automation skills, includin
 - fixture-based setup and teardown for tests requiring existing API resources;
 - controlled `PATCH` operations with deliberately limited request payloads;
 - persisted-state verification through a follow-up `GET` request;
+- explicit `DELETE` scenario with post-deletion `404` verification;
+- conditional fallback cleanup for failed destructive scenarios;
 - environment and secret management;
 - safe handling of destructive test operations;
 - cleanup strategy for created test data;
