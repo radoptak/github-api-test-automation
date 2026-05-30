@@ -46,6 +46,16 @@ Verifies that the framework can:
 
 This scenario keeps setup and cleanup outside the test body, so the test remains focused on repository retrieval behaviour.
 
+### Missing Sandbox Repository Retrieval Test
+
+Verifies that the framework can:
+
+- generate a safe sandbox repository name without creating the repository;
+- attempt to retrieve the missing repository through `GET`;
+- confirm that the API returns `404`.
+
+This scenario validates a controlled negative path for missing sandbox resources.
+
 ### Sandbox Repository Description Update Test
 
 Verifies that the framework can:
@@ -401,22 +411,23 @@ Generated reports are excluded from version control.
 
 ## Implemented Scenarios
 
-| Area                 | Scenario                                                                                                   | Status      |
-| -------------------- | ---------------------------------------------------------------------------------------------------------- | ----------- |
-| Authentication       | Return the configured authenticated GitHub user.                                                           | Implemented |
-| Repository safety    | Generate and validate safe sandbox repository names.                                                       | Implemented |
-| Repository creation  | Create a private repository in the sandbox organization.                                                   | Implemented |
-| Repository retrieval | Retrieve an existing private repository prepared by a reusable fixture.                                    | Implemented |
-| Repository update    | Update the description of an existing private repository and confirm the persisted state.                  | Implemented |
-| Repository deletion  | Delete an existing private repository and confirm that subsequent retrieval returns `404`.                 | Implemented |
-| Repository cleanup   | Clean up repositories created by tests or fixtures, including fallback cleanup for deletion failure paths. | Implemented |
+| Area                          | Scenario                                                                                                   | Status      |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------- |
+| Authentication                | Return the configured authenticated GitHub user.                                                           | Implemented |
+| Repository safety             | Generate and validate safe sandbox repository names.                                                       | Implemented |
+| Repository creation           | Create a private repository in the sandbox organization.                                                   | Implemented |
+| Repository retrieval          | Retrieve an existing private repository prepared by a reusable fixture.                                    | Implemented |
+| Repository negative retrieval | Return `404` when trying to retrieve a missing sandbox repository.                                         | Implemented |
+| Repository update             | Update the description of an existing private repository and confirm the persisted state.                  | Implemented |
+| Repository deletion           | Delete an existing private repository and confirm that subsequent retrieval returns `404`.                 | Implemented |
+| Repository cleanup            | Clean up repositories created by tests or fixtures, including fallback cleanup for deletion failure paths. | Implemented |
 
 ## Roadmap
 
 Planned next steps:
 
 - build a complete repository CRUD lifecycle scenario;
-- add negative API scenarios such as duplicate repository creation and missing resources;
+- add more negative API scenarios such as duplicate repository creation;
 - add a client-level safety test confirming that unsafe repository names are blocked before any API request is sent;
 - configure GitHub Actions CI securely;
 - publish HTML test reports as CI artifacts;
