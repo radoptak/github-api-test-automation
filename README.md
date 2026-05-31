@@ -1,5 +1,7 @@
 # GitHub API Test Automation Framework
 
+[![API tests](https://github.com/radoptak/github-api-test-automation/actions/workflows/api-tests.yml/badge.svg)](https://github.com/radoptak/github-api-test-automation/actions/workflows/api-tests.yml)
+
 Portfolio-ready API test automation framework built with **Playwright** and **TypeScript** against the **GitHub REST API**.
 
 The project demonstrates not only API test implementation, but also safe handling of authenticated and destructive test operations, maintainable framework architecture, CI execution, and deliberate engineering decisions suitable for a real-world QA Automation project.
