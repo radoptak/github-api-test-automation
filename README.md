@@ -15,89 +15,18 @@ The project demonstrates not only API test implementation, but also safe handlin
 - dotenv
 - Playwright HTML reporting
 
-## Current Test Coverage
+### GitHub Sandbox Repository Client Safety Tests
 
-### Authenticated User Smoke Test
+Verify that the repository client blocks unsafe repository names before sending API requests.
 
-Verifies that the configured GitHub token:
+The tests confirm that unsafe names are blocked for:
 
-- successfully authenticates against `GET /user`;
-- belongs to the expected configured user;
-- returns valid basic profile data.
+- repository creation through `POST`;
+- repository retrieval through `GET`;
+- repository description update through `PATCH`;
+- repository deletion through `DELETE`.
 
-### Sandbox Repository Creation Test
-
-Verifies that the framework can:
-
-- create a private repository in a dedicated sandbox organization;
-- confirm that the repository was created under the expected organization;
-- confirm that the created repository is private;
-- remove the created repository during cleanup;
-- report the create, verify, and cleanup phases as readable Playwright test steps.
-
-### Duplicate Sandbox Repository Creation Test
-
-Verifies that the framework can:
-
-- create an initial private sandbox repository;
-- try to create another repository with the same name;
-- confirm that the duplicate creation attempt returns `422`;
-- remove the created repository during cleanup.
-
-This scenario validates a controlled negative path for duplicate sandbox repository creation.
-
-### Sandbox Repository Retrieval Test
-
-Verifies that the framework can:
-
-- prepare an existing private repository through a reusable fixture;
-- retrieve that repository from the sandbox organization using `GET`;
-- confirm its expected name, owner, description, and privacy state;
-- remove the fixture-created repository during teardown.
-
-This scenario keeps setup and cleanup outside the test body, so the test remains focused on repository retrieval behaviour.
-
-### Missing Sandbox Repository Retrieval Test
-
-Verifies that the framework can:
-
-- generate a safe sandbox repository name without creating the repository;
-- attempt to retrieve the missing repository through `GET`;
-- confirm that the API returns `404`.
-
-This scenario validates a controlled negative path for missing sandbox resources.
-
-### Sandbox Repository Description Update Test
-
-Verifies that the framework can:
-
-- prepare an existing private repository through a reusable fixture;
-- update only its description through `PATCH`;
-- confirm the updated repository details in the `PATCH` response;
-- retrieve the repository again through `GET` to confirm that the updated description was persisted;
-- remove the fixture-created repository during teardown.
-
-The first update scenario intentionally changes only the repository description, avoiding mutations such as renaming the resource or changing its visibility, which would increase cleanup risk.
-
-### Sandbox Repository Deletion Test
-
-Verifies that the framework can:
-
-- prepare a private sandbox repository specifically for deletion;
-- delete the existing repository through `DELETE`;
-- confirm the successful deletion response;
-- retrieve the deleted repository through `GET` and confirm that it returns `404`;
-- perform fallback cleanup only if deletion was not successfully confirmed.
-
-This scenario intentionally creates and manages its own repository because deletion itself is the behaviour under test.
-
-### Sandbox Repository Name Unit Tests
-
-Verify the local safety mechanism responsible for repository naming:
-
-- generated repository names contain the required test prefix;
-- valid sandbox repository names are accepted;
-- repository names outside the test naming convention are rejected.
+These tests use a fake API request context, so they verify client-level safety without contacting the real GitHub API.
 
 ## Safety-First Design
 
@@ -426,6 +355,7 @@ Generated reports are excluded from version control.
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------- |
 | Authentication                | Return the configured authenticated GitHub user.                                                           | Implemented |
 | Repository safety             | Generate and validate safe sandbox repository names.                                                       | Implemented |
+| Repository client safety      | Block unsafe repository names before any API request is sent.                                              | Implemented |
 | Repository creation           | Create a private repository in the sandbox organization.                                                   | Implemented |
 | Repository negative creation  | Return `422` when trying to create a duplicate sandbox repository.                                         | Implemented |
 | Repository retrieval          | Retrieve an existing private repository prepared by a reusable fixture.                                    | Implemented |
@@ -439,7 +369,6 @@ Generated reports are excluded from version control.
 Planned next steps:
 
 - build a complete repository CRUD lifecycle scenario;
-- add a client-level safety test confirming that unsafe repository names are blocked before any API request is sent;
 - configure GitHub Actions CI securely;
 - publish HTML test reports as CI artifacts;
 - expand recruiter-facing documentation as the framework grows.
@@ -457,6 +386,8 @@ This project is intended to demonstrate practical QA Automation skills, includin
 - controlled `PATCH` operations with deliberately limited request payloads;
 - persisted-state verification through a follow-up `GET` request;
 - explicit `DELETE` scenario with post-deletion `404` verification;
+- controlled negative API scenarios for duplicate and missing resources;
+- client-level safety verification before API requests are sent;
 - conditional fallback cleanup for failed destructive scenarios;
 - environment and secret management;
 - safe handling of destructive test operations;
