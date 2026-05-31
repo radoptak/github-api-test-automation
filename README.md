@@ -48,6 +48,10 @@ Current safety measures include:
 ## Architecture Overview
 
 ```text
+.github/
+└── workflows/
+    └── api-tests.yml
+
 src/
 ├── clients/
 │   └── github-sandbox-repository.client.ts
@@ -63,13 +67,16 @@ src/
 
 tests/
 ├── repositories/
+│   ├── create-duplicate-sandbox-repository.spec.ts
 │   ├── create-sandbox-repository.spec.ts
 │   ├── delete-sandbox-repository.spec.ts
+│   ├── get-missing-sandbox-repository.spec.ts
 │   ├── get-sandbox-repository.spec.ts
 │   └── update-sandbox-repository-description.spec.ts
 ├── smoke/
 │   └── authenticated-user.spec.ts
 └── unit/
+    ├── github-sandbox-repository-client.spec.ts
     └── sandbox-repository-name.spec.ts
 ```
 
@@ -270,10 +277,22 @@ npm test -- tests/smoke/authenticated-user.spec.ts
 npm test -- tests/repositories/create-sandbox-repository.spec.ts
 ```
 
+### Duplicate Sandbox Repository Creation Test Only
+
+```bash
+npm test -- tests/repositories/create-duplicate-sandbox-repository.spec.ts
+```
+
 ### Sandbox Repository Retrieval Test Only
 
 ```bash
 npm test -- tests/repositories/get-sandbox-repository.spec.ts
+```
+
+### Missing Sandbox Repository Retrieval Test Only
+
+```bash
+npm test -- tests/repositories/get-missing-sandbox-repository.spec.ts
 ```
 
 ### Sandbox Repository Description Update Test Only
@@ -288,10 +307,22 @@ npm test -- tests/repositories/update-sandbox-repository-description.spec.ts
 npm test -- tests/repositories/delete-sandbox-repository.spec.ts
 ```
 
-### Local Safety Unit Tests Only
+### Sandbox Repository Name Unit Tests Only
 
 ```bash
 npm test -- tests/unit/sandbox-repository-name.spec.ts
+```
+
+### GitHub Sandbox Repository Client Safety Tests Only
+
+```bash
+npm test -- tests/unit/github-sandbox-repository-client.spec.ts
+```
+
+### All Unit Tests Only
+
+```bash
+npm test -- tests/unit
 ```
 
 ## Test Reporting
@@ -348,6 +379,7 @@ npx playwright show-report
 ```
 
 Generated reports are excluded from version control.
+In GitHub Actions, the Playwright HTML report is uploaded as a workflow artifact, so failed CI runs can be inspected without generating reports locally.
 
 ## Implemented Scenarios
 
@@ -369,8 +401,6 @@ Generated reports are excluded from version control.
 Planned next steps:
 
 - build a complete repository CRUD lifecycle scenario;
-- configure GitHub Actions CI securely;
-- publish HTML test reports as CI artifacts;
 - expand recruiter-facing documentation as the framework grows.
 
 ## What This Project Demonstrates
