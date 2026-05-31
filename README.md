@@ -35,6 +35,17 @@ Verifies that the framework can:
 - remove the created repository during cleanup;
 - report the create, verify, and cleanup phases as readable Playwright test steps.
 
+### Duplicate Sandbox Repository Creation Test
+
+Verifies that the framework can:
+
+- create an initial private sandbox repository;
+- try to create another repository with the same name;
+- confirm that the duplicate creation attempt returns `422`;
+- remove the created repository during cleanup.
+
+This scenario validates a controlled negative path for duplicate sandbox repository creation.
+
 ### Sandbox Repository Retrieval Test
 
 Verifies that the framework can:
@@ -416,6 +427,7 @@ Generated reports are excluded from version control.
 | Authentication                | Return the configured authenticated GitHub user.                                                           | Implemented |
 | Repository safety             | Generate and validate safe sandbox repository names.                                                       | Implemented |
 | Repository creation           | Create a private repository in the sandbox organization.                                                   | Implemented |
+| Repository negative creation  | Return `422` when trying to create a duplicate sandbox repository.                                         | Implemented |
 | Repository retrieval          | Retrieve an existing private repository prepared by a reusable fixture.                                    | Implemented |
 | Repository negative retrieval | Return `404` when trying to retrieve a missing sandbox repository.                                         | Implemented |
 | Repository update             | Update the description of an existing private repository and confirm the persisted state.                  | Implemented |
@@ -427,7 +439,6 @@ Generated reports are excluded from version control.
 Planned next steps:
 
 - build a complete repository CRUD lifecycle scenario;
-- add more negative API scenarios such as duplicate repository creation;
 - add a client-level safety test confirming that unsafe repository names are blocked before any API request is sent;
 - configure GitHub Actions CI securely;
 - publish HTML test reports as CI artifacts;
