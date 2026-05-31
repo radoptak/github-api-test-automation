@@ -4,9 +4,18 @@
 
 Portfolio-ready API test automation framework built with **Playwright** and **TypeScript** against the **GitHub REST API**.
 
-The project demonstrates not only API test implementation, but also safe handling of authenticated and destructive test operations, maintainable framework architecture, CI execution, and deliberate engineering decisions suitable for a real-world QA Automation project.
+The project demonstrates API test implementation, safe handling of authenticated and destructive operations, maintainable framework architecture, CI execution, and deliberate engineering decisions suitable for a real-world QA Automation project.
 
-> **Project status:** Actively developed. The current version covers authenticated user verification, safe private repository creation, retrieval, description update, deletion, negative API scenarios, client-level safety checks, a complete repository lifecycle scenario, and GitHub Actions CI inside an isolated sandbox organization.
+> **Project status:** Actively developed. The current version covers authenticated user verification, repository CRUD scenarios, negative API paths, client-level safety checks, a complete repository lifecycle test, and GitHub Actions CI inside an isolated sandbox organization.
+
+## Project Highlights
+
+- Real GitHub REST API tests using Playwright and TypeScript.
+- Positive and negative repository scenarios, including `CREATE`, `GET`, `PATCH`, `DELETE`, duplicate creation, and missing-resource validation.
+- Full repository lifecycle coverage from creation to post-deletion `404` verification.
+- Safety-first design using a dedicated sandbox organization, private repositories, controlled payloads, runtime guards, and fallback cleanup.
+- Client-level safety tests confirming that unsafe repository names are blocked before API requests are sent.
+- GitHub Actions CI with TypeScript validation, full test execution, and Playwright HTML report artifacts.
 
 ## Tech Stack
 
