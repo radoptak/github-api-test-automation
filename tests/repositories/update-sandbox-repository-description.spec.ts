@@ -19,9 +19,8 @@ test.describe('Sandbox repository API', () => {
     const updatedDescription =
       'Repository description updated by automated PATCH test.';
 
-    const updateResponse = await test.step(
-      'Update the sandbox repository description',
-      async () => {
+    const updateResponse =
+      await test.step('Update the sandbox repository description', async () => {
         const response = await repositoryClient.updateRepositoryDescription(
           sandboxRepository.name,
           {
@@ -32,8 +31,7 @@ test.describe('Sandbox repository API', () => {
         expect(response.status()).toBe(200);
 
         return response;
-      },
-    );
+      });
 
     await test.step('Verify updated repository details in the PATCH response', async () => {
       const responseBody =

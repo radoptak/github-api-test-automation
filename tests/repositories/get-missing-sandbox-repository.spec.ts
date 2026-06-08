@@ -8,8 +8,9 @@ test.describe('Sandbox repository API', () => {
     const missingRepositoryName = createSandboxRepositoryName();
 
     await test.step('Try to retrieve a missing sandbox repository', async () => {
-      const response =
-        await repositoryClient.getRepository(missingRepositoryName);
+      const response = await repositoryClient.getRepository(
+        missingRepositoryName,
+      );
 
       expect(response.status()).toBe(404);
     });

@@ -8,7 +8,9 @@ function createApiRequestSpy(onRequest: () => void): APIRequestContext {
   const failIfCalled = async () => {
     onRequest();
 
-    throw new Error('API request should not be sent for unsafe repository names.');
+    throw new Error(
+      'API request should not be sent for unsafe repository names.',
+    );
   };
 
   return {

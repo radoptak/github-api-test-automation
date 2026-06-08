@@ -22,11 +22,13 @@ test.describe('Sandbox repository API', () => {
       });
 
       await test.step('Try to create a duplicate sandbox repository', async () => {
-        const duplicateCreateResponse = await repositoryClient.createRepository({
-          name: repositoryName,
-          description: 'Duplicate repository creation attempt.',
-          private: true,
-        });
+        const duplicateCreateResponse = await repositoryClient.createRepository(
+          {
+            name: repositoryName,
+            description: 'Duplicate repository creation attempt.',
+            private: true,
+          },
+        );
 
         expect(duplicateCreateResponse.status()).toBe(422);
       });

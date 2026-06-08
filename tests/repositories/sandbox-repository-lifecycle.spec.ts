@@ -42,7 +42,8 @@ test.describe('Sandbox repository API', () => {
       });
 
       await test.step('Retrieve the created sandbox repository', async () => {
-        const getResponse = await repositoryClient.getRepository(repositoryName);
+        const getResponse =
+          await repositoryClient.getRepository(repositoryName);
 
         expect(getResponse.status()).toBe(200);
 
@@ -71,7 +72,8 @@ test.describe('Sandbox repository API', () => {
       });
 
       await test.step('Verify the updated description is persisted', async () => {
-        const getResponse = await repositoryClient.getRepository(repositoryName);
+        const getResponse =
+          await repositoryClient.getRepository(repositoryName);
 
         expect(getResponse.status()).toBe(200);
 
@@ -91,7 +93,8 @@ test.describe('Sandbox repository API', () => {
       });
 
       await test.step('Verify the deleted sandbox repository is no longer available', async () => {
-        const getResponse = await repositoryClient.getRepository(repositoryName);
+        const getResponse =
+          await repositoryClient.getRepository(repositoryName);
 
         expect(getResponse.status()).toBe(404);
       });

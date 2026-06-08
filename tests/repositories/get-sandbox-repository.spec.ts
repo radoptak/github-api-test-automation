@@ -12,9 +12,8 @@ test.describe('Sandbox repository API', () => {
     repositoryClient,
     sandboxRepository,
   }) => {
-    const getResponse = await test.step(
-      'Retrieve an existing private sandbox repository',
-      async () => {
+    const getResponse =
+      await test.step('Retrieve an existing private sandbox repository', async () => {
         const response = await repositoryClient.getRepository(
           sandboxRepository.name,
         );
@@ -22,8 +21,7 @@ test.describe('Sandbox repository API', () => {
         expect(response.status()).toBe(200);
 
         return response;
-      },
-    );
+      });
 
     await test.step('Verify retrieved repository details', async () => {
       const responseBody =
