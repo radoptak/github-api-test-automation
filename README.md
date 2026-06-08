@@ -15,7 +15,7 @@ The project demonstrates API test implementation, safe handling of authenticated
 - Full repository lifecycle coverage from creation to post-deletion `404` verification.
 - Safety-first design using a dedicated sandbox organization, private repositories, controlled payloads, runtime guards, and fallback cleanup.
 - Client-level safety tests confirming that unsafe repository names are blocked before API requests are sent.
-- GitHub Actions CI with TypeScript validation, full test execution, and Playwright HTML report artifacts.
+- GitHub Actions CI with TypeScript validation, linting, formatting validation, full test execution, and Playwright HTML report artifacts.
 
 ## Tech Stack
 
@@ -24,6 +24,8 @@ The project demonstrates API test implementation, safe handling of authenticated
 - GitHub REST API
 - Node.js 24
 - dotenv
+- ESLint
+- Prettier
 - Playwright HTML reporting
 - GitHub Actions
 
@@ -206,7 +208,7 @@ tests/
 | `tests/smoke`        | Validates the authenticated API foundation.                                                                                      |
 | `tests/repositories` | Validates repository behaviour inside the sandbox organization.                                                                  |
 | `tests/unit`         | Validates local framework safety logic without external API dependencies.                                                        |
-| `.github/workflows`  | Runs typecheck, API tests, and report artifact upload in GitHub Actions.                                                         |
+| `.github/workflows`  | Runs typecheck, linting, formatting validation, API tests, and report artifact upload in GitHub Actions.                         |
 
 ## Key Engineering Decisions
 
@@ -392,6 +394,18 @@ The local `.env` file is ignored by Git and must never be committed.
 
 ```bash
 npm run typecheck
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+### Formatting Check
+
+```bash
+npm run format:check
 ```
 
 ### Full Test Suite
