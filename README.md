@@ -474,6 +474,8 @@ The CI workflow performs:
 
 - dependency installation with `npm ci`;
 - TypeScript validation through `npm run typecheck`;
+- linting through `npm run lint`;
+- formatting validation through `npm run format:check`;
 - full Playwright API test execution through `npm test`;
 - Playwright HTML report upload as a workflow artifact.
 
@@ -617,7 +619,8 @@ This project is intended to demonstrate practical QA Automation skills, includin
 - safe handling of destructive test operations;
 - cleanup strategy for created test data;
 - unit testing of framework safety mechanisms;
-- incremental, reviewable Git history.
+- incremental, reviewable Git history;
+- ESLint and Prettier quality gates in local development and CI.
 
 ## Author
 
